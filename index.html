@@ -463,6 +463,7 @@ footer {
         <ul>
           <li>A compact network of dense layers (Linear + LayerNorm blocks, configurable depth), trained with cross-entropy.</li>
           <li>For the Hailo NPU, the same network was rewritten with convolutional layers, and I fixed the export tensor layout so it compiles for the accelerator.</li>
+          <li><b>Also explored:</b> a multi-head variant with separate heads for action, amount and direction, so commands are recognised as combinations. The single classifier was accurate enough for the first-phase demo, so it shipped. The multi-head design fits better as the vocabulary grows.</li>
         </ul>
       </div>
       <div class="sub">
