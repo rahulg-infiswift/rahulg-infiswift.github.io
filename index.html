@@ -99,7 +99,8 @@ a { color: var(--accent); }
 }
 .hero h1 { font-size: var(--step-4); font-weight: 700; letter-spacing: -0.02em; }
 .hero h1 span { color: var(--accent); }
-.hero .lede { font-size: var(--step-1); color: var(--muted); max-width: 60ch; }
+.hero .lede { font-size: var(--step-1); color: var(--muted); max-width: 62ch; }
+.links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-family: var(--font-mono); font-size: 0.9rem; }
 .focus { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .chip {
   font-family: var(--font-mono);
@@ -221,8 +222,6 @@ figcaption code { font-family: var(--font-mono); font-size: 0.85rem; font-weight
 }
 .metric .v { font-family: var(--font-display); font-size: var(--step-2); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
 .metric .d { font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
-.metric.tbd { border-left-style: dashed; border-left-color: var(--metal); }
-.metric.tbd .v { color: var(--metal); font-family: var(--font-mono); font-size: var(--step-0); font-weight: 500; }
 
 .takeaway {
   padding: 1.2rem 1.4rem;
@@ -245,26 +244,31 @@ footer {
 <div class="wrap">
 
 <header class="hero">
-  <div class="label">Portfolio · ML &amp; Robotics Engineer</div>
+  <div class="label">Portfolio · Senior Data Scientist, Machine Learning &amp; Robotics</div>
   <h1>Rahul Garg<span>.</span></h1>
-  <p class="lede">I build robot systems that see, listen and act: perception from RGB-D cameras, grasp estimation, collision-aware motion planning, and speech interfaces that run on the edge. Below are two industry projects from my work at Infiswift.</p>
+  <p class="lede">I build robot systems that see, plan and act: deep-learning perception, 3D vision, grasp estimation and motion planning on a 6-DoF industrial arm, plus speech models that run on edge hardware. Next, I want to replace hand-built robot pipelines with learned models: vision-language-action models for manipulation, touch for precise insertion, and learning from human demonstrations.</p>
+  <div class="links">
+    <a href="https://www.linkedin.com/in/irahulgarg">linkedin.com/in/irahulgarg</a>
+    <a href="https://github.com/rahulg-infiswift">github.com/rahulg-infiswift</a>
+  </div>
   <div class="focus">
-    <span class="chip">RGB-D perception</span>
-    <span class="chip">6-DoF grasp estimation</span>
+    <span class="chip">3D perception</span>
+    <span class="chip">pose &amp; grasp estimation</span>
     <span class="chip">motion planning</span>
-    <span class="chip">speech &amp; keyword spotting</span>
+    <span class="chip">VLA models</span>
+    <span class="chip">tactile manipulation</span>
     <span class="chip">edge deployment</span>
   </div>
   <nav class="toc" aria-label="Projects">
     <a href="#manipulation">
-      <span class="label">Project A · 2023–2026</span>
-      <strong>Voice- and vision-commanded pick-and-insert</strong>
-      <span>Spoken English/Japanese commands drive an industrial arm that picks screws from clutter and inserts them into a plate.</span>
+      <span class="label">Project A · flagship</span>
+      <strong>Vision-based industrial manipulation</strong>
+      <span>Camera-guided pick, place and insertion on a 6-DoF arm, at about 95% success on non-cluttered scenes.</span>
     </a>
-    <a href="#wakeword">
-      <span class="label">Project B · 2026</span>
-      <strong>On-device wake-word &amp; command detection</strong>
-      <span>A keyword spotter trained on synthetic speech, running in 10 ms frames on CPU and an edge NPU.</span>
+    <a href="#speech">
+      <span class="label">Project B</span>
+      <strong>Multi-head spoken-command classifier</strong>
+      <span>A custom CNN for short spoken commands, quantised and running on a Hailo accelerator at about 300 ms detection latency.</span>
     </a>
   </nav>
 </header>
@@ -272,34 +276,33 @@ footer {
 <!-- ============ PROJECT A ============ -->
 <article class="project" id="manipulation">
   <div class="proj-head">
-    <div class="label">Project A</div>
-    <h2>Voice- and vision-commanded robotic pick-and-insert</h2>
+    <div class="label">Project A · Flagship</div>
+    <h2>Vision-based industrial manipulation system</h2>
     <dl class="meta">
-      <div><dt class="label">Role</dt><dd>ML / Robotics Engineer, core developer on a ~6-person team</dd></div>
-      <div><dt class="label">Duration</dt><dd>Nov 2023 – Mar 2026</dd></div>
-      <div><dt class="label">Robot</dt><dd>6-DOF industrial arm, parallel-jaw gripper, two RGB-D cameras</dd></div>
+      <div><dt class="label">Role</dt><dd>Senior Data Scientist (ML &amp; Robotics), Infiswift Technologies</dd></div>
+      <div><dt class="label">Robot</dt><dd>6-DOF industrial arm, gripper, fixed + wrist-mounted RGB-D cameras</dd></div>
+      <div><dt class="label">Tasks</dt><dd>Pick, place and insert, commanded by voice or UI</dd></div>
     </dl>
     <div class="stack">
-      <span class="chip">PyTorch</span><span class="chip">RF-DETR</span><span class="chip">Segment Anything</span><span class="chip">OpenCV</span><span class="chip">Open3D</span><span class="chip">PyBullet</span><span class="chip">Intel RealSense</span><span class="chip">Whisper</span><span class="chip">FastAPI</span><span class="chip">Streamlit</span>
+      <span class="chip">PyTorch</span><span class="chip">Grounding DINO</span><span class="chip">RF-DETR</span><span class="chip">Segment Anything</span><span class="chip">Intel RealSense</span><span class="chip">Open3D</span><span class="chip">PyBullet</span><span class="chip">Redis</span><span class="chip">WebSockets</span><span class="chip">React</span>
     </div>
   </div>
 
   <section class="block read">
     <h3>Problem</h3>
-    <p>An industrial robotics client wanted operators to control a robot arm by voice, in English or Japanese. Simple jogs like <em>“move J1 10 degrees”</em> were only the start. The real goal was autonomous tasks such as <em>“pick up a screw and insert it into the plate”</em>. That meant finding small, shiny, randomly oriented screws in a cluttered bin, estimating a 6-DoF grasp, planning a collision-free path, and inserting each screw into a grid of holes, reliably over long unattended runs.</p>
+    <p>The goal was an industrial arm that finds an object with a camera, plans how to reach it, and picks, places and inserts it on its own. The objects were small, shiny screws lying at random angles, and each one had to go into a specific hole in a plate. That needed deep-learning detection, 3D perception, pose estimation, collision-free motion planning and grasping, all working together reliably over long unattended runs.</p>
   </section>
 
   <section class="block">
     <h3>Pipeline</h3>
     <div class="flow-wrap">
       <ol class="flow">
-        <li><strong>Speech to text</strong><span>Whisper service; Japanese is translated to English</span></li>
-        <li><strong>Command parsing</strong><span>Normalisation, entity extraction, joint-limit checks</span></li>
-        <li><strong>Sensing</strong><span>Persistent dual RGB-D camera service, point clouds</span></li>
-        <li><strong>Perception</strong><span>RF-DETR → SAM → filtering → pick ranking</span></li>
-        <li><strong>Grasp pose</strong><span>3D stem axis → tool frame, Euler disambiguation</span></li>
-        <li><strong>Planning</strong><span>Live scene mesh in PyBullet, IK, RRT-family planners</span></li>
-        <li><strong>Execution</strong><span>Controller SDK + gripper, retries, pose-error logging</span></li>
+        <li><strong>Command</strong><span>Spoken (Whisper) or from the UI</span></li>
+        <li><strong>Sensing</strong><span>Fixed long-range and wrist-mounted RGB-D cameras</span></li>
+        <li><strong>Perception</strong><span>Fine-tuned detector + SAM, filtering, pick ranking</span></li>
+        <li><strong>Pose &amp; grasp</strong><span>3D object pose → grasp angle → tool frame</span></li>
+        <li><strong>Planning</strong><span>Workspace mesh, IK, BiRRT / RRT*</span></li>
+        <li><strong>Execution</strong><span>Approach, grip, lift, move, insert, return</span></li>
       </ol>
     </div>
   </section>
@@ -308,52 +311,51 @@ footer {
     <h3>How it works</h3>
     <div class="subs">
       <div class="sub">
-        <h4>Perception: picking from clutter</h4>
+        <h4>Detection &amp; segmentation</h4>
         <ul>
-          <li>RF-DETR detection, then SAM instance segmentation of each candidate. GroundingDINO was evaluated and later retired.</li>
-          <li>A filtering cascade: ArUco-defined work area, size, confidence, stem geometry, valid depth, and rejection of false positives from shadows.</li>
-          <li>A <b>depth-aware composite score</b> ranks survivors by confidence, mask area, elongation and height, so the robot picks the top-most, clearly separated screw instead of just the most confident detection.</li>
-          <li>Stage-by-stage “true pick” diagnostics show where good candidates are lost.</li>
+          <li>Fine-tuned two pretrained pipelines, Grounding DINO + SAM and RF-DETR + SAM, and chose the one fast and accurate enough for live use.</li>
+          <li>A filtering cascade: work area defined by ArUco markers, size, confidence, stem geometry, valid depth, and rejection of false positives caused by shadows.</li>
+          <li>A <b>depth-aware composite score</b> ranks candidates by confidence, mask area, elongation and height, so the arm picks the top-most, clearly separated object.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>Stem detection &amp; grasp pose</h4>
+        <h4>Pose &amp; grasp estimation</h4>
         <ul>
-          <li>PCA on the segmentation mask finds the screw's main axis. A robust local-thickness measure (95th-percentile cross-section) tells head from tail.</li>
-          <li>The 2D endpoints are lifted to 3D with the aligned depth map, then turned into a full tool frame (see the figure below).</li>
-          <li>Out of the equivalent ZYX Euler solutions, the one closest to the current pose is chosen, and the gimbal-lock case is pinned explicitly, which keeps IK stable.</li>
+          <li>PCA on the segmentation mask finds the screw's main axis. A robust thickness measure tells the head from the tail.</li>
+          <li>The axis is lifted to 3D with depth and turned into a full grasp frame, so the grip angle follows the object's shape (see the figure below).</li>
+          <li>Out of the equivalent Euler-angle solutions, the one closest to the current pose is chosen, and gimbal lock is handled explicitly, which keeps IK stable.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>3D sensing &amp; insertion targets</h4>
+        <h4>3D perception &amp; calibration</h4>
         <ul>
-          <li>A long-range overview camera captures scene geometry; a close-range camera is used for picking.</li>
-          <li>A long-lived camera process with bounded queues gives on-demand capture, frame retries, timestamped point clouds and a freshness check, so the planner never sees a stale scene.</li>
-          <li>The plate's hole grid comes from its CAD model and is placed in the robot frame with an ArUco tag (solvePnP).</li>
+          <li>Intel RealSense and Open3D turn depth images into point clouds and a 3D map of the work area.</li>
+          <li><b>Two-camera workflow:</b> a fixed long-range camera guides the approach, and a wrist-mounted camera refines the final insertion position.</li>
+          <li>The camera, work area and robot are calibrated together with ArUco markers, and points are transformed between the camera, robot and world frames.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>Planning &amp; execution</h4>
+        <h4>Motion planning &amp; grasping</h4>
         <ul>
-          <li>A PyBullet digital twin from the robot's URDF. The collision mesh is rebuilt from live point clouds (cluster selection, then Poisson, ball-pivoting or alpha-shape reconstruction).</li>
-          <li>IK is solved against the robot alone; obstacles are used during path planning with RRT-Connect / RRT* and smoothing.</li>
-          <li>A ctypes wrapper around the vendor's C controller SDK and a serial gripper driver, with timeout recovery, speed overrides for fine moves, and logging of commanded vs. actual pose.</li>
+          <li>PyBullet planning with sampling-based planners (BiRRT, RRT*). The reconstructed workspace mesh is the obstacle for collision checking.</li>
+          <li>Representing the workspace as <b>one reconstructed mesh instead of many voxel bodies</b> cut planning for the most cluttered step from about 45 s to about 3 s.</li>
+          <li>Inverse kinematics, plus straight-line moves for approach, grip, insert and pull-back. A failed path or IK solution is recomputed automatically instead of stopping the task.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>Speech &amp; commands</h4>
+        <h4>System architecture</h4>
         <ul>
-          <li>A FastAPI Whisper (large-v3-turbo) service. Japanese is translated to English, so one parser handles both languages.</li>
-          <li>Audio normalisation to 16 kHz mono with an ffmpeg fallback for phone recordings.</li>
-          <li>Entity extraction maps utterances to joint moves, Cartesian moves, programs, speed and tool settings, each checked against joint limits.</li>
+          <li>Split one large codebase into separate perception, control and interface services that communicate over Redis and WebSockets.</li>
+          <li>A React front end shows pipeline state, timing and failures in real time.</li>
+          <li>The perception and speech services keep their models loaded between tasks.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>Operator UI &amp; testing</h4>
+        <h4>Voice commands</h4>
         <ul>
-          <li>A multi-page Streamlit app: voice input, live camera feeds, axis monitor, calibration, and a stream of the simulator.</li>
-          <li>pytest suites for command parsing and English/Japanese voice processing.</li>
-          <li>Long-duration soak tests on the physical robot.</li>
+          <li>A Whisper speech-to-text service handles English and Japanese, translating Japanese to English so one parser serves both.</li>
+          <li>Entity extraction maps utterances to joint moves, Cartesian moves and task commands, each checked against joint limits.</li>
+          <li>Switching the inference backend made transcription about 3.7× faster with no loss in accuracy.</li>
         </ul>
       </div>
     </div>
@@ -365,12 +367,10 @@ footer {
         <marker id="ahz" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ax-z)"/></marker>
         <marker id="ahy" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ax-y)"/></marker>
       </defs>
-      <!-- bin floor grid -->
       <g stroke="var(--line)" stroke-width="1" fill="none">
         <path d="M20 40 H280 M20 90 H280 M20 140 H280 M20 190 H280 M20 240 H280"/>
         <path d="M40 20 V250 M100 20 V250 M160 20 V250 M220 20 V250 M280 20 V250"/>
       </g>
-      <!-- screw rotated -30deg around grasp point (150,140) -->
       <g transform="rotate(-30 150 140)">
         <rect x="70" y="132" width="150" height="16" rx="3" fill="var(--metal)"/>
         <g stroke="var(--surface)" stroke-width="1.5" opacity="0.7">
@@ -378,26 +378,22 @@ footer {
         </g>
         <path d="M220 132 L238 140 L220 148 z" fill="var(--metal)"/>
         <rect x="46" y="118" width="26" height="44" rx="5" fill="var(--metal)"/>
-        <!-- PCA axis -->
         <path d="M30 140 H262" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 4" fill="none"/>
-        <!-- Z along stem -->
         <path d="M150 140 H222" stroke="var(--ax-z)" stroke-width="3" fill="none" marker-end="url(#ahz)"/>
-        <!-- Y across -->
         <path d="M150 140 V82" stroke="var(--ax-y)" stroke-width="3" fill="none" marker-end="url(#ahy)"/>
       </g>
-      <!-- X into page -->
       <circle cx="150" cy="140" r="9" fill="var(--surface)" stroke="var(--ax-x)" stroke-width="2.5"/>
       <path d="M144 134 L156 146 M156 134 L144 146" stroke="var(--ax-x)" stroke-width="2.5"/>
-      <text x="215" y="92" fill="var(--ax-z)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="500">+Z</text>
+      <text x="205" y="136" fill="var(--ax-z)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="500">+Z</text>
       <text x="96" y="70" fill="var(--ax-y)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="500">+Y</text>
       <text x="164" y="170" fill="var(--ax-x)" font-family="JetBrains Mono, monospace" font-size="13" font-weight="500">+X</text>
-      <text x="38" y="196" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="11">head</text>
+      <text x="36" y="226" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="11">head</text>
       <text x="236" y="76" fill="var(--muted)" font-family="JetBrains Mono, monospace" font-size="11">tail</text>
     </svg>
     <figcaption id="frame-cap">
       <span class="label">Grasp tool frame, top-down view of the bin</span>
       <div class="axis"><code class="cx">+X</code><span>Approach direction, straight down into the bin.</span></div>
-      <div class="axis"><code class="cz">+Z</code><span>Along the screw stem from head to tail, taken from the PCA axis of the SAM mask and lifted to 3D.</span></div>
+      <div class="axis"><code class="cz">+Z</code><span>Along the screw stem from head to tail, taken from the PCA axis of the mask and lifted to 3D.</span></div>
       <div class="axis"><code class="cy">+Y</code><span>The gripper's closing axis across the screw diameter, completing a right-handed frame.</span></div>
     </figcaption>
   </figure>
@@ -405,59 +401,58 @@ footer {
   <section class="block">
     <h3>My role</h3>
     <ul class="role">
-      <li><b>Task orchestration</b><span>Wrote most of the main pipeline linking speech, vision, sensing, planning and execution for pick-and-place and screw insertion, including error recovery and progress reporting.</span></li>
-      <li><b>Vision pipeline &amp; API</b><span>Filtering cascade, depth-aware pick scoring, PCA stem detector, 3D grasp pose estimator with the Euler and gimbal-lock fixes, and benchmarking and diagnostic tools.</span></li>
-      <li><b>Speech service</b><span>Built the FastAPI Whisper service and audio handling. Moving to a local endpoint cut UI-to-API latency by about 2 s.</span></li>
-      <li><b>Camera service</b><span>Persistent camera process, on-demand capture, frame retries, point-cloud freshness checks and graceful shutdown.</span></li>
-      <li><b>Planning integration</b><span>Robust mesh refresh, configurable surface reconstruction, planner tuning.</span></li>
-      <li><b>Reliability</b><span>Tracked down long-run failures: controller timeouts, dropped camera frames, a unit mismatch in pick-point maths, and simulator rendering leaks.</span></li>
-      <li><b>UI &amp; insertion targets</b><span>Streamlit operator UI and ArUco-based localisation of the hole grid.</span></li>
+      <li><b>Perception</b><span>Fine-tuned and compared the detection + segmentation pipelines. Built the filtering cascade and depth-aware pick scoring.</span></li>
+      <li><b>Pose &amp; grasp</b><span>3D pose and grasp-angle estimation from object shape, including the Euler-angle and gimbal-lock fixes.</span></li>
+      <li><b>3D vision &amp; calibration</b><span>RealSense + Open3D point clouds and workspace map, ArUco calibration, frame transformations, and the two-camera insertion workflow.</span></li>
+      <li><b>Motion planning</b><span>PyBullet planning with BiRRT / RRT*, the single-mesh workspace (45 s → 3 s), IK, straight-line moves and automatic retry.</span></li>
+      <li><b>Task sequencing</b><span>The multi-step pick-and-place sequence: approach, grip, lift, move, place or insert, and return.</span></li>
+      <li><b>System architecture</b><span>Split the codebase into perception, control and interface services over Redis and WebSockets, with a real-time React front end.</span></li>
     </ul>
   </section>
 
   <section class="block">
     <h3>Results</h3>
     <div class="metrics">
-      <div class="metric"><span class="v">EN + JP</span><span class="d">Voice-to-manipulation system demonstrated to the client in both languages.</span></div>
-      <div class="metric"><span class="v">~3.7×</span><span class="d">Faster speech-to-text (6.1 s → 1.6 s) after the team switched inference backend, with no loss in word error rate.</span></div>
-      <div class="metric tbd"><span class="v">[add] pick success</span><span class="d">Success rate over N trials.</span></div>
-      <div class="metric tbd"><span class="v">[add] cycle time</span><span class="d">Average pick-and-insert cycle and the longest unattended run.</span></div>
+      <div class="metric"><span class="v">~95%</span><span class="d">Autonomous pick-and-place success on non-cluttered scenes.</span></div>
+      <div class="metric"><span class="v">45 s → 3 s</span><span class="d">Motion planning for the most cluttered step (pickup to insert), single mesh vs. voxel bodies, compared under identical conditions.</span></div>
+      <div class="metric"><span class="v">2 cameras</span><span class="d">A fixed long-range camera for the approach and a wrist-mounted camera for precise insertion.</span></div>
+      <div class="metric"><span class="v">EN + JP</span><span class="d">Voice commands in English and Japanese drive the same task pipeline.</span></div>
     </div>
   </section>
 
-  <p class="takeaway read"><span class="label">What I learned</span>Real robot systems fail at the seams between perception, planning and control. Most of the engineering went into handling uncertainty: stale sensor data, controller timeouts, shadows that look like objects, and degenerate geometry like gimbal lock. That experience is why I want to study robot perception and manipulation in depth.</p>
+  <p class="takeaway read"><span class="label">What I learned</span>Every stage of this system is hand-engineered, and most of the work went into the gaps between stages: stale sensor data, shadows that look like objects, gimbal lock, planner failures. Insertion in particular showed me the limits of vision alone. That is why I want to research learned, end-to-end approaches: vision-language-action models, touch for contact-rich tasks, and learning from human demonstrations.</p>
 </article>
 
 <!-- ============ PROJECT B ============ -->
-<article class="project" id="wakeword">
+<article class="project" id="speech">
   <div class="proj-head">
     <div class="label">Project B</div>
-    <h2>On-device wake-word and command detection</h2>
+    <h2>Multi-head neural classifier for spoken-command recognition</h2>
     <dl class="meta">
       <div><dt class="label">Role</dt><dd>Lead and sole developer</dd></div>
-      <div><dt class="label">Duration</dt><dd>Apr 2026 – May 2026</dd></div>
-      <div><dt class="label">Target</dt><dd>Edge device: CPU and Hailo NPU</dd></div>
+      <div><dt class="label">Target</dt><dd>Hailo edge-AI accelerator, live audio stream</dd></div>
+      <div><dt class="label">Output</dt><dd>Action, amount and direction of a spoken command</dd></div>
     </dl>
     <div class="stack">
-      <span class="chip">PyTorch</span><span class="chip">openWakeWord</span><span class="chip">ONNX Runtime</span><span class="chip">Hailo NPU</span><span class="chip">Qwen TTS</span><span class="chip">NumPy</span>
+      <span class="chip">PyTorch</span><span class="chip">ONNX</span><span class="chip">Quantisation</span><span class="chip">Hailo Edge AI</span><span class="chip">TTS data generation</span>
     </div>
   </div>
 
   <section class="block read">
     <h3>Problem</h3>
-    <p>The voice-controlled robot needed an always-on detector on an edge device. It listens for a custom wake phrase plus short control words (<em>start</em>, <em>stop</em>), so operators don't have to press a button and a full speech recogniser doesn't have to run all the time. No recordings of the wake phrase existed, and in a noisy factory a false trigger is costly.</p>
+    <p>Operators needed to give the robot short spoken commands with an always-on model that runs on an edge device, without a full speech recogniser in the loop. A command combines an action, an amount and a direction. In a factory, a false trigger moves a real robot, so the model must reject near-misses and background speech.</p>
   </section>
 
   <section class="block">
     <h3>Pipeline</h3>
     <div class="flow-wrap">
       <ol class="flow">
-        <li><strong>Synthesise positives</strong><span>Qwen TTS voice cloning from VCTK and JVS speakers</span></li>
-        <li><strong>Mine negatives</strong><span>Confusable phrases, FSD50K sounds, on-site mic audio</span></li>
-        <li><strong>Augment &amp; featurise</strong><span>Room impulse responses, background audio, mel + embeddings</span></li>
-        <li><strong>Train</strong><span>Single- and multi-class heads with balanced sampling</span></li>
-        <li><strong>Export</strong><span>ONNX, NPU-compatible layout, quantisation calibration data</span></li>
-        <li><strong>Stream</strong><span>10 ms frames on CPU or the Hailo NPU</span></li>
+        <li><strong>Build dataset</strong><span>Synthetic positives from TTS voice cloning</span></li>
+        <li><strong>Hard negatives</strong><span>Easy, medium and hard negatives, near-miss phrases</span></li>
+        <li><strong>Features</strong><span>Mel-spectrogram + pretrained audio embedding</span></li>
+        <li><strong>Train</strong><span>Multi-head CNN: action, amount, direction</span></li>
+        <li><strong>Export</strong><span>ONNX, quantised for the accelerator</span></li>
+        <li><strong>Run</strong><span>Continuous inference on live audio</span></li>
       </ol>
     </div>
   </section>
@@ -466,35 +461,32 @@ footer {
     <h3>How it works</h3>
     <div class="subs">
       <div class="sub">
-        <h4>Data generation</h4>
+        <h4>Model</h4>
         <ul>
-          <li>Positives are synthesised by voice cloning from reference speakers, with configurable voice variations for more speaker diversity.</li>
-          <li>Adaptive handling of CUDA out-of-memory errors (batch backoff and retry) keeps long generation jobs running on limited GPUs.</li>
-          <li>Hard negatives come from three sources: confusable speech, environmental sound categories, and real recordings from the deployment room.</li>
+          <li>A custom multi-head CNN on top of a mel-spectrogram front end and a pretrained audio embedding model.</li>
+          <li>Separate output heads for the <b>action</b>, the <b>amount</b> and the <b>direction</b>, so commands are recognised as combinations instead of one fixed list.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>Training</h4>
+        <h4>Dataset</h4>
         <ul>
-          <li>A stage-based layout (samples → dataset → features → model → eval). Every run is self-contained and traceable to its sample pool.</li>
-          <li>Augmentation with room impulse responses and AudioSet/FMA backgrounds, plus ~2,000 h of precomputed ACAV100M negative features.</li>
-          <li>Environmental negatives are sampled separately during multi-class training to keep the classes balanced.</li>
+          <li>Built from scratch. Positives were synthesised with TTS voice cloning from multi-speaker corpora for speaker diversity.</li>
+          <li>Easy, medium and hard negatives plus near-miss phrases, so the model does not fire on similar-sounding speech. Environmental sounds and on-site microphone recordings were added as negatives.</li>
+          <li>Augmented with room impulse responses and background audio.</li>
         </ul>
       </div>
       <div class="sub">
-        <h4>Edge runtime</h4>
+        <h4>Edge deployment</h4>
         <ul>
-          <li>A streaming runtime with 10 ms frames, in synchronous and producer/consumer modes.</li>
-          <li>The mel frontend is reimplemented natively from pre-extracted weights, so production no longer needs the <code>onnx</code> package.</li>
-          <li>Backends for ONNX Runtime (split and merged graphs) and a Hailo NPU. I fixed the export tensor layout (B, C, H, W) so the model compiles for the accelerator.</li>
+          <li>Exported to ONNX, quantised, and deployed on a Hailo edge-AI accelerator. Calibration data comes from the same augmented training set.</li>
+          <li>A streaming runtime processes the live audio stream continuously. A lean native mel front end removes heavy dependencies from the device image.</li>
         </ul>
       </div>
       <div class="sub">
         <h4>Evaluation</h4>
         <ul>
-          <li>Clip-level ground-truth scoring with a detection policy (thresholds and RMS energy gating) that matches the deployed runtime.</li>
-          <li>Recording of continuous audio streams to find false positives under real conditions.</li>
-          <li>Latency benchmarks for the mel frontend and the end-to-end runtime.</li>
+          <li>Scoring uses the same detection policy as the deployed runtime (thresholds plus energy gating).</li>
+          <li>Continuous real-world audio is recorded to find false triggers that clip-level metrics miss.</li>
         </ul>
       </div>
     </div>
@@ -503,19 +495,18 @@ footer {
   <section class="block">
     <h3>Results</h3>
     <div class="metrics">
-      <div class="metric"><span class="v">10 ms</span><span class="d">Streaming frame cadence on the edge runtime.</span></div>
-      <div class="metric"><span class="v">3 backends</span><span class="d">Split ONNX, merged ONNX and Hailo NPU, all from one training pipeline.</span></div>
-      <div class="metric tbd"><span class="v">[add] recall</span><span class="d">True-accept rate per class.</span></div>
-      <div class="metric tbd"><span class="v">[add] FA / hour</span><span class="d">False accepts per hour on continuous audio.</span></div>
+      <div class="metric"><span class="v">~300 ms</span><span class="d">Detection latency, running continuously on a live audio stream.</span></div>
+      <div class="metric"><span class="v">On-device</span><span class="d">Quantised ONNX model running in real time on a Hailo accelerator.</span></div>
+      <div class="metric"><span class="v">3 heads</span><span class="d">Action, amount and direction recognised jointly by one model.</span></div>
     </div>
   </section>
 
-  <p class="takeaway read"><span class="label">What I learned</span>Data was the bottleneck, not the model. The design of the synthetic positives and especially the hard negatives mattered far more than changes to the architecture. Testing on continuous real-world audio exposed failures that clip-level metrics hid.</p>
+  <p class="takeaway read"><span class="label">What I learned</span>Data was the bottleneck, not the model. How I designed the hard negatives and near-misses mattered more than any architecture change, and testing on continuous real-world audio exposed failures that clip-level metrics hid. Building datasets carefully is a skill I expect to use directly in learning robot policies from demonstrations.</p>
 </article>
 
 <footer>
-  <span>Rahul Garg · ML &amp; Robotics Engineer</span>
-  <span>Both projects were built for a client at Infiswift. Client names, hardware model numbers, vendor SDKs and source code are left out for confidentiality.</span>
+  <span>Rahul Garg · Senior Data Scientist, Machine Learning &amp; Robotics · <a href="https://www.linkedin.com/in/irahulgarg">LinkedIn</a> · <a href="https://github.com/rahulg-infiswift">GitHub</a></span>
+  <span>Both projects were built at Infiswift Technologies. Client names, hardware model numbers, vendor SDKs and source code are left out for confidentiality.</span>
 </footer>
 
 </div>
