@@ -267,8 +267,8 @@ footer {
     </a>
     <a href="#speech">
       <span class="label">Project B</span>
-      <strong>Multi-head spoken-command classifier</strong>
-      <span>A custom CNN for short spoken commands, quantised and running on a Hailo accelerator at about 300 ms detection latency.</span>
+      <strong>Spoken-command recognition pipeline</strong>
+      <span>Mel spectrogram, a frozen speech-embedding model and a custom classifier over 40+ robot commands, running on a Hailo accelerator at about 300 ms latency.</span>
     </a>
   </nav>
 </header>
@@ -427,65 +427,63 @@ footer {
 <article class="project" id="speech">
   <div class="proj-head">
     <div class="label">Project B</div>
-    <h2>Multi-head neural classifier for spoken-command recognition</h2>
+    <h2>Spoken-command recognition pipeline</h2>
     <dl class="meta">
       <div><dt class="label">Role</dt><dd>Lead and sole developer</dd></div>
       <div><dt class="label">Target</dt><dd>Hailo edge-AI accelerator, live audio stream</dd></div>
-      <div><dt class="label">Output</dt><dd>Action, amount and direction of a spoken command</dd></div>
+      <div><dt class="label">Vocabulary</dt><dd>40+ robot command words plus background</dd></div>
     </dl>
     <div class="stack">
-      <span class="chip">PyTorch</span><span class="chip">ONNX</span><span class="chip">Quantisation</span><span class="chip">Hailo Edge AI</span><span class="chip">TTS data generation</span>
+      <span class="chip">PyTorch</span><span class="chip">openWakeWord</span><span class="chip">ONNX</span><span class="chip">Quantisation</span><span class="chip">Hailo Edge AI</span><span class="chip">TTS data generation</span>
     </div>
   </div>
 
   <section class="block read">
     <h3>Problem</h3>
-    <p>Operators needed to give the robot short spoken commands with an always-on model that runs on an edge device, without a full speech recogniser in the loop. A command combines an action, an amount and a direction. In a factory, a false trigger moves a real robot, so the model must reject near-misses and background speech.</p>
+    <p>Operators needed to give the robot short spoken commands, such as motion words, axes, joints, speed and tool, using an always-on model on an edge device, without a full speech recogniser in the loop. In a factory, a false trigger moves a real robot, so the model must reject near-misses and background speech. No recordings of the command vocabulary existed.</p>
   </section>
 
   <section class="block">
-    <h3>Pipeline</h3>
+    <h3>Three-stage model</h3>
     <div class="flow-wrap">
       <ol class="flow">
-        <li><strong>Build dataset</strong><span>Synthetic positives from TTS voice cloning</span></li>
-        <li><strong>Hard negatives</strong><span>Easy, medium and hard negatives, near-miss phrases</span></li>
-        <li><strong>Features</strong><span>Mel-spectrogram + pretrained audio embedding</span></li>
-        <li><strong>Train</strong><span>Multi-head CNN: action, amount, direction</span></li>
-        <li><strong>Export</strong><span>ONNX, quantised for the accelerator</span></li>
-        <li><strong>Run</strong><span>Continuous inference on live audio</span></li>
+        <li><strong>Mel spectrogram</strong><span>16 kHz audio to mel frames. Pretrained; I reimplemented it natively for the device</span></li>
+        <li><strong>Speech embedding</strong><span>Pretrained and frozen: 16 time steps × 96 features</span></li>
+        <li><strong>Command classifier</strong><span>Custom, trained by me: softmax over 40+ commands plus background</span></li>
       </ol>
     </div>
+    <p class="read" style="color:var(--muted);font-size:0.95rem">Freezing the first two stages means only a small classifier is trained. That makes training on synthetic data practical and keeps the model small enough for the edge device.</p>
   </section>
 
   <section class="block">
     <h3>How it works</h3>
     <div class="subs">
       <div class="sub">
-        <h4>Model</h4>
+        <h4>Classifier</h4>
         <ul>
-          <li>A custom multi-head CNN on top of a mel-spectrogram front end and a pretrained audio embedding model.</li>
-          <li>Separate output heads for the <b>action</b>, the <b>amount</b> and the <b>direction</b>, so commands are recognised as combinations instead of one fixed list.</li>
+          <li>A compact network of dense layers (Linear + LayerNorm blocks, configurable depth), trained with cross-entropy.</li>
+          <li>For the Hailo NPU, the same network was rewritten with convolutional layers, and I fixed the export tensor layout so it compiles for the accelerator.</li>
         </ul>
       </div>
       <div class="sub">
         <h4>Dataset</h4>
         <ul>
-          <li>Built from scratch. Positives were synthesised with TTS voice cloning from multi-speaker corpora for speaker diversity.</li>
-          <li>Easy, medium and hard negatives plus near-miss phrases, so the model does not fire on similar-sounding speech. Environmental sounds and on-site microphone recordings were added as negatives.</li>
+          <li>Positives synthesised with TTS voice cloning from multi-speaker English and Japanese corpora, with an automatic quality filter.</li>
+          <li>Easy, medium and hard negatives plus near-miss phrases, drawn from LibriSpeech speech, FMA music, FSD50K sounds and on-site microphone recordings.</li>
           <li>Augmented with room impulse responses and background audio.</li>
         </ul>
       </div>
       <div class="sub">
         <h4>Edge deployment</h4>
         <ul>
-          <li>Exported to ONNX, quantised, and deployed on a Hailo edge-AI accelerator. Calibration data comes from the same augmented training set.</li>
-          <li>A streaming runtime processes the live audio stream continuously. A lean native mel front end removes heavy dependencies from the device image.</li>
+          <li>Exported to ONNX, quantised with calibration data from the training set, and deployed on a Hailo accelerator.</li>
+          <li>A streaming runtime processes live audio continuously in 10 ms frames.</li>
         </ul>
       </div>
       <div class="sub">
         <h4>Evaluation</h4>
         <ul>
-          <li>Scoring uses the same detection policy as the deployed runtime (thresholds plus energy gating).</li>
+          <li>Scoring uses the same detection policy as the deployed runtime, including false positives per hour.</li>
           <li>Continuous real-world audio is recorded to find false triggers that clip-level metrics miss.</li>
         </ul>
       </div>
@@ -496,12 +494,12 @@ footer {
     <h3>Results</h3>
     <div class="metrics">
       <div class="metric"><span class="v">~300 ms</span><span class="d">Detection latency, running continuously on a live audio stream.</span></div>
-      <div class="metric"><span class="v">On-device</span><span class="d">Quantised ONNX model running in real time on a Hailo accelerator.</span></div>
-      <div class="metric"><span class="v">3 heads</span><span class="d">Action, amount and direction recognised jointly by one model.</span></div>
+      <div class="metric"><span class="v">40+ words</span><span class="d">Robot command vocabulary recognised by one compact classifier.</span></div>
+      <div class="metric"><span class="v">On-device</span><span class="d">Quantised classifier running in real time on a Hailo accelerator.</span></div>
     </div>
   </section>
 
-  <p class="takeaway read"><span class="label">What I learned</span>Data was the bottleneck, not the model. How I designed the hard negatives and near-misses mattered more than any architecture change, and testing on continuous real-world audio exposed failures that clip-level metrics hid. Building datasets carefully is a skill I expect to use directly in learning robot policies from demonstrations.</p>
+  <p class="takeaway read"><span class="label">What I learned</span>Data was the bottleneck, not the model. With the front-end stages frozen, how I designed the synthetic positives, hard negatives and near-misses mattered more than any architecture change, and testing on continuous real-world audio exposed failures that clip-level metrics hid. Building datasets carefully is a skill I expect to use directly in learning robot policies from demonstrations.</p>
 </article>
 
 <footer>
